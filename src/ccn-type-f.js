@@ -63,9 +63,6 @@ class CookieConsentNotice {
                                           <button type="button" id="acceptCookies" class="btn__accept accept__btn__styles" style="color: ${this.banner.acceptBtn.color}; background-color: ${this.banner.acceptBtn.background};">
                                               ${this.banner.acceptBtn.text}
                                           </button>
-                                          <button type="button" id="rejectCookies" class="btn__settings settings__btn__styles" style="color: ${this.banner.rejectBtn.color}; background-color: ${this.banner.rejectBtn.background};">
-                                              ${this.banner.rejectBtn.text}
-                                          </button>
                                       </div>
                                   </div>
                               `;
@@ -76,7 +73,6 @@ class CookieConsentNotice {
     // SET EVENT LISTENERS
     document.getElementById('prebannerBtn').addEventListener('click', () => this.openSelector())
     document.getElementById('acceptCookies').addEventListener('click', () => this.acceptCookies())
-    document.getElementById('rejectCookies').addEventListener('click', () => this.rejectCookies())
   }
 
   checkStatus() {
@@ -111,11 +107,6 @@ class CookieConsentNotice {
     this.addCustomScript()
   }
 
-  rejectCookies() {
-    localStorage.setItem("CookieConsentNotice", "0");
-    this.openManageCookies();
-    this.disableTracking();
-  }
 
   activateTracking() {
     // Google Analytics Tracking
@@ -172,44 +163,6 @@ class CookieConsentNotice {
     }
   }
 
-  disableTracking() {
-    // Google Analytics Tracking ('client_storage': 'none')
-    if (this.tracking.AnalyticsCode) {
-      let Analytics = document.createElement('script');
-      Analytics.setAttribute('src', `https://www.googletagmanager.com/gtag/js?id=${this.tracking.AnalyticsCode}`);
-      document.head.appendChild(Analytics);
-      let AnalyticsData = document.createElement('script');
-      AnalyticsData.text = `window.dataLayer = window.dataLayer || [];
-                          function gtag(){dataLayer.push(arguments);}
-                          gtag('js', new Date());
-                          gtag('config', '${this.tracking.AnalyticsCode}' , {
-                              'client_storage': 'none',
-                              'anonymize_ip': true
-                          });`;
-      document.head.appendChild(AnalyticsData);
-    }
-
-    // Clear cookies - not working 100%
-    this.clearCookies()
-  }
-
-  clearCookies() {
-    let cookies = document.cookie.split("; ");
-    for (let c = 0; c < cookies.length; c++) {
-      let d = window.location.hostname.split(".");
-      while (d.length > 0) {
-        let cookieBase = encodeURIComponent(cookies[c].split(";")[0].split("=")[0]) + '=; expires=Thu, 01-Jan-1970 00:00:01 GMT; domain=' + d.join('.') + ' ;path=';
-        let p = location.pathname.split('/');
-        document.cookie = cookieBase + '/';
-        while (p.length > 0) {
-          document.cookie = cookieBase + p.join('/');
-          p.pop();
-        };
-        d.shift();
-      }
-    }
-  }
-
   addCustomScript() {
     if (this.tracking.customScript !== undefined) {
       let customScriptTag
@@ -262,11 +215,6 @@ class CookieConsentNotice {
         background: obj.acceptBtnBackground || '#209cee',
         color: obj.acceptBtnColor || '#fff'
       },
-      rejectBtn: {
-        text: obj.rejectBtnText || lang.rejectBtnText,
-        background: obj.rejectBtnBackground || '#eeeeee',
-        color: obj.rejectBtnColor || '#4a4a4a'
-      },
       manageCookies: {
         color: obj.manageColor || '#4a4a4a',
         background: obj.manageBackground || '#fff',
@@ -287,7 +235,6 @@ class LanguagesGC {
     this.bannerDescription = lang['bannerDescription']
     this.bannerLinkText = lang['bannerLinkText']
     this.acceptBtnText = lang['acceptBtnText']
-    this.rejectBtnText = lang['rejectBtnText']
     this.manageText = lang['manageText']
   }
 
@@ -298,7 +245,6 @@ class LanguagesGC {
         'bannerDescription': 'Ons gebruik ons eie koekies en die van derdepartye, om inhoud te verpersoonlik en om webverkeer te ontleed.',
         'bannerLinkText': 'Lees meer oor koekies',
         'acceptBtnText': 'Aanvaar koekies',
-        'rejectBtnText': 'Weier',
         'manageText': 'Koekie-instellings'
       },
       en: {
@@ -306,7 +252,6 @@ class LanguagesGC {
         'bannerDescription': 'We use our own and third-party cookies to personalize content and to analyze web traffic.',
         'bannerLinkText': 'Read more about cookies',
         'acceptBtnText': 'Accept cookies',
-        'rejectBtnText': 'Reject',
         'manageText': 'Manage cookies'
       }
     }
